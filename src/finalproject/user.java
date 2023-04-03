@@ -11,16 +11,16 @@ package finalproject;
 import java.util.*;
 
 public class user {
-    
+
     public String userID;
     public String firstName;
     public String lastName;
     public String email;
     public Boolean hasBorrowed;
     public ArrayList<String> borrowedBooks;
-    
+
     //constructor
-    public user(){
+    public user() {
         this.userID = "";
         this.firstName = "";
         this.lastName = "";
@@ -28,8 +28,9 @@ public class user {
         this.hasBorrowed = false;
         this.borrowedBooks = new ArrayList<>();
     }
+
     //object updater via menu    
-    public user(String userID, String firstName, String lastName, String email, Boolean hasBorrowed){
+    public user(String userID, String firstName, String lastName, String email, Boolean hasBorrowed) {
         this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;

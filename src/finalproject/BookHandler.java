@@ -81,9 +81,18 @@ public class BookHandler {
     public static void _addBookToLibrary() {
 
         int isbn = _checkISBN("Whats the ISBN of the book you would like to add?");
-        _isDuplicateISBN(isbn);
+        if (isbn == -1) {
+            return;
+        }
+
+        if (!_isDuplicateISBN(isbn)) {
+            return;
+        }
 
         double price = _checkPrice("Whats the price of the book you would like to add?");
+        if (price == -1.0) {
+            return;
+        }
 
         String title = Main.userString("Whats the title of the book you would like to add?");
         //String title = _input.next();
@@ -97,6 +106,9 @@ public class BookHandler {
     // deletes Book obj from arraylist if isbn matches
     public static void _removeBookFromLibrary() {
         int isbn = _checkISBN("Whats the ISBN of the book you would like to remove?");
+        if (isbn == -1) {
+            return;
+        }
 
         // NOTE: add logic to prevent deletion before book is returned
         for (int i = 0; i < _booksAvailable.size(); i++) {
@@ -108,6 +120,10 @@ public class BookHandler {
 
     public static void _checkOutBook() {
         int isbn = _checkISBN("What's the ISBN of the book you would like to check out?");
+        if (isbn == -1) {
+            return;
+        }
+
         boolean flag = false;
         int bookIdx = 0;
 
@@ -144,6 +160,10 @@ public class BookHandler {
     public static void _returnBook() {
         if (_booksChecked.size() != 0 && _booksAvailable.size() != 0) {
             int isbn = _checkISBN("What's the ISBN of the book you would like to return?");
+            if (isbn == -1) {
+                return;
+            }
+
             boolean availableFlag = false;
             boolean bookChckdFlag = false;
             int bookAvailableIdx = -1;
@@ -204,6 +224,9 @@ public class BookHandler {
     // searches by isbn and prints out a book object
     public static void _doesBookExist() {
         int isbn = _checkISBN("Whats the ISBN of the book you are searching for?");
+        if (isbn == -1) {
+            return;
+        }
 
         for (Book book : _booksAvailable) {
             if (book.isbn == isbn) {
@@ -221,6 +244,9 @@ public class BookHandler {
     // updates book obj if isbn is found to match
     public static void _updateBookInLibrary() {
         int isbn = _checkISBN("Whats the ISBN of the book you are wanting to update?");
+        if (isbn == -1) {
+            return;
+        }
 
         for (int i = 0; i < _booksAvailable.size(); i++) {
             if (_booksAvailable.get(i).isbn == isbn) {
@@ -230,6 +256,9 @@ public class BookHandler {
                         + String.valueOf(_formatCost(_booksAvailable.get(i).price))
                         + "\r\n");
                 double price = _checkPrice("Whats the new price of the book?");
+                if (price == -1.0) {
+                    return;
+                }
 
                 String title = Main.userString("Whats the new title of the book?");
                 //String title = _input.next();
@@ -280,16 +309,16 @@ public class BookHandler {
             }
         } catch (java.util.InputMismatchException e) {
             Main.errorMessage("You entered your value as an unrecognized value.\nMake sure it is in a correct format and try again.\nExamples: 97 or 36.8, not -29 or 0.");
-            System.exit(0);
+            return -1.0;
         } catch (Exception e) {
             // I chose to not fail quietly here for all other exceptions to give the user some sort of failure notification
             Main.errorMessage("An unknown error has occured.\nTry again and if the error persists, contact a System Admin.");
-            System.exit(0);
+            return -1.0;
         }
         return userInput;
     }
 
-    private static void _isDuplicateISBN(int ISBN) {
+    private static boolean _isDuplicateISBN(int ISBN) {
         try {
             for (Book book : _booksAvailable) {
                 if (book.isbn == ISBN) {
@@ -298,12 +327,13 @@ public class BookHandler {
             }
         } catch (java.util.InputMismatchException e) {
             Main.errorMessage("The ISBN you entered was a duplicate value.");
-            System.exit(0);
+            return false;
         } catch (Exception e) {
             // I chose to not fail quietly here for all other exceptions to give the user some sort of failure notification
             Main.errorMessage("An unknown error has occured.\nTry again and if the error persists, contact a System Admin.");
-            System.exit(0);
+            return false;
         }
+        return true;
     }
 
     // Checks if int is negative, above 3 chars in length
@@ -316,11 +346,11 @@ public class BookHandler {
             }
         } catch (java.util.InputMismatchException e) {
             Main.errorMessage("You entered too many characters and your value is now an unrecognized value.\nMake sure it is in a correct format and try again.\nExamples: 123 or 1, not -29 or 1234");
-            System.exit(0);
+            return -1;
         } catch (Exception e) {
             // I chose to not fail quietly here for all other exceptions to give the user some sort of failure notification
             Main.errorMessage("An unknown error has occured.\nTry again and if the error persists, contact a System Admin.");
-            System.exit(0);
+            return -1;
         }
         return userInput;
     }

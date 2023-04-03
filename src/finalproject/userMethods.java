@@ -70,7 +70,7 @@ public class userMethods {
         JTextField email = new JTextField();
 
         //Create a unique random User ID
-        String userID = createUserID.randomID();
+        String userID = randomID();
         isDuplicateID(userID);
 
         //Enter and verify user information
@@ -236,9 +236,23 @@ public class userMethods {
     private static void isDuplicateID(String userID) {
         for (user users : currentUsers) {
             if (users.userID.equals(userID)) {
-                userID = createUserID.randomID();
+                userID = randomID();
             }
         }
+    }
+
+    public static String randomID() {
+        String userID = "";
+
+        for (int i = 0; i < 1; i++) {
+            Random digit = new Random();
+            int randomInt = digit.nextInt(10);
+
+            String num = Integer.toString(randomInt);
+            userID = userID + num;
+        }
+
+        return userID;
     }
 
 }
