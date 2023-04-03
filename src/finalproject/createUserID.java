@@ -15,7 +15,7 @@ public class createUserID {
     public static String randomID(){
         String userID = "";
         
-        for(int i =0; i < 8;i++){
+        for(int i =0; i < 1;i++){
             Random digit = new Random();
             int randomInt = digit.nextInt(10);
             

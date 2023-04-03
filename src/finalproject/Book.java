@@ -13,6 +13,7 @@ class Book {
     public int isbn;
     public double price;
     public boolean isBorrowed;
+    
     //default constructor
     public Book(){
         this.title = "";

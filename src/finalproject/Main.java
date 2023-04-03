@@ -1,22 +1,21 @@
 package finalproject;
+
 import javax.swing.*;
 
-public class Main 
-{
-    public static void main(String[] args) 
-    {
+public class Main {
+
+    public static void main(String[] args) {
         int mainMenuPopup;
         do // main menu
         {
-            Object[] mainMenuText =
-            {
-                "Book Menu",
-                "User Menu",
-                "Exit"
-            };
+            Object[] mainMenuText
+                    = {
+                        "Book Menu",
+                        "User Menu",
+                        "Exit"
+                    };
             mainMenuPopup = JOptionPane.showOptionDialog(null, "Please choose an option:", "Main Menu", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, mainMenuText, null);
-            switch (mainMenuPopup) 
-            {
+            switch (mainMenuPopup) {
                 case JOptionPane.YES_OPTION: // book menu
                     bookMenu();
                     break;
@@ -24,21 +23,19 @@ public class Main
                     userMenu();
                     break;
                 default: // cancel button
-                    JOptionPane.showMessageDialog(null,"Thank you for using the library!");
+                    JOptionPane.showMessageDialog(null, "Thank you for using the library!");
                     break;
             }
-        }
-        while (mainMenuPopup != JOptionPane.CANCEL_OPTION);
+        } while (mainMenuPopup != JOptionPane.CANCEL_OPTION);
     }
-    public static void bookMenu()
-    {
+
+    public static void bookMenu() {
         int bookMenuPopup;
-        do
-        {
+        do {
             JTextField bookMenuChoice = new JTextField();
-            Object[] bookMenuText =
-            {
-                """
+            Object[] bookMenuText
+                    = {
+                        """
                 1. Add a book
                 2. Remove a book
                 3. Check out a book
@@ -49,11 +46,10 @@ public class Main
                 8. Update a book
 
                 Please choose one of the above options:""", bookMenuChoice
-            };
-            bookMenuPopup = JOptionPane.showConfirmDialog(null,bookMenuText, "Book Menu", JOptionPane.OK_CANCEL_OPTION);
-            if (bookMenuPopup == JOptionPane.OK_OPTION)
-                switch (bookMenuChoice.getText()) 
-                {
+                    };
+            bookMenuPopup = JOptionPane.showConfirmDialog(null, bookMenuText, "Book Menu", JOptionPane.OK_CANCEL_OPTION);
+            if (bookMenuPopup == JOptionPane.OK_OPTION) {
+                switch (bookMenuChoice.getText()) {
                     case "1":
                         BookHandler._addBookToLibrary();
                         break;
@@ -82,18 +78,17 @@ public class Main
                         JOptionPane.showMessageDialog(null, "Invalid input! Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                         break;
                 }
-        }
-        while (bookMenuPopup != JOptionPane.CANCEL_OPTION);
+            }
+        } while (bookMenuPopup != JOptionPane.CANCEL_OPTION);
     }
-    public static void userMenu()
-    {
+
+    public static void userMenu() {
         int userMenuPopup;
-        do
-        {
+        do {
             JTextField userMenuChoice = new JTextField();
-            Object[] userMenuText =
-            {
-                """
+            Object[] userMenuText
+                    = {
+                        """
                 1. Create User
                 2. Edit User
                 3. View All Users
@@ -102,11 +97,10 @@ public class Main
                 6. Reactivate Archived User
 
                 Please choose one of the above options:""", userMenuChoice
-            };
-            userMenuPopup = JOptionPane.showConfirmDialog(null,userMenuText, "User Menu", JOptionPane.OK_CANCEL_OPTION);
-            if (userMenuPopup == JOptionPane.OK_OPTION)
-                switch (userMenuChoice.getText()) 
-                {
+                    };
+            userMenuPopup = JOptionPane.showConfirmDialog(null, userMenuText, "User Menu", JOptionPane.OK_CANCEL_OPTION);
+            if (userMenuPopup == JOptionPane.OK_OPTION) {
+                switch (userMenuChoice.getText()) {
                     case "1":
                         userMethods.createNewUser();
                         break;
@@ -129,31 +123,31 @@ public class Main
                         JOptionPane.showMessageDialog(null, "Invalid input! Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
                         break;
                 }
-        }
-        while (userMenuPopup != JOptionPane.CANCEL_OPTION);
+            }
+        } while (userMenuPopup != JOptionPane.CANCEL_OPTION);
     }
-    public static void userMessage(String message)
-    {
+
+    public static void userMessage(String message) {
         JOptionPane.showMessageDialog(null, message);
     }
-    public static void errorMessage(String message)
-    {
+
+    public static void errorMessage(String message) {
         JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
-    public static int userInt(String message)
-    {
+
+    public static int userInt(String message) {
         String input = JOptionPane.showInputDialog(null, message);
         int output = Integer.parseInt(input);
         return output;
     }
-    public static double userDouble(String message)
-    {
+
+    public static double userDouble(String message) {
         String input = JOptionPane.showInputDialog(null, message);
         double output = Double.parseDouble(input);
         return output;
     }
-    public static String userString(String message)
-    {
+
+    public static String userString(String message) {
         String input = JOptionPane.showInputDialog(null, message);
         return input;
     }

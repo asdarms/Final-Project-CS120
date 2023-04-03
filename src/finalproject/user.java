@@ -8,6 +8,8 @@ package finalproject;
  *
  * @author samue
  */
+import java.util.*;
+
 public class user {
     
     public String userID;
@@ -15,6 +17,7 @@ public class user {
     public String lastName;
     public String email;
     public Boolean hasBorrowed;
+    public ArrayList<String> borrowedBooks;
     
     //constructor
     public user(){
@@ -23,6 +26,7 @@ public class user {
         this.lastName = "";
         this.email = "";
         this.hasBorrowed = false;
+        this.borrowedBooks = new ArrayList<>();
     }
     //object updater via menu    
     public user(String userID, String firstName, String lastName, String email, Boolean hasBorrowed){
@@ -31,5 +35,6 @@ public class user {
         this.lastName = lastName;
         this.email = email;
         this.hasBorrowed = hasBorrowed;
+        this.borrowedBooks = new ArrayList<>();
     }
 }
