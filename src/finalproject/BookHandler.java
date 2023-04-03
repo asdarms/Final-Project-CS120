@@ -23,6 +23,60 @@ public class BookHandler {
     private static ArrayList<Book> _booksAvailable = new ArrayList<Book>();
     private static ArrayList<BorrowedBook> _booksChecked = new ArrayList<BorrowedBook>();
     
+    public static void main(String[] args) {
+        _directory();
+    }
+    
+    // home menu for funcs
+    private static void _directory(){
+        _userPrompt("[1] Would you like to add a book to the library's vault?");
+        _userPrompt("[2] Would you like to remove a book from the library's vault?");
+        _userPrompt("[3] Would you like to check out a book from the library's vault?");
+        _userPrompt("[4] Would you like to return a book to the library's vault?");
+        _userPrompt("[5] Would you like to print out a list of all books from the library's vault?");
+        _userPrompt("[6] Would you like to print out a list of all checked out books?");
+        _userPrompt("[7] Would you like to see if specific book exists within the library's vault?");
+        _userPrompt("[8] Would you like to update some infromation of a book?");
+        _userPrompt("[9] Would you like to exit the program?");
+        
+        int userInput = _input.nextInt();
+        
+        switch (userInput) {
+            case 1:
+                _addBookToLibrary();
+                break;
+            case 2:
+                _removeBookFromLibrary();
+                break;
+            case 3:
+                _checkOutBook();
+                break;
+            case 4:
+                _returnBook();
+                break;
+            case 5:
+                _printAllBooks();
+                break;
+            case 6:
+                _printAllBorrowedBooks();
+                break;
+            case 7:
+                _doesBookExist();
+                break;
+            case 8:
+                _updateBookInLibrary();
+                break;
+            case 9:
+                _userPrompt("Goodbye!");
+                System.exit(0);
+                break;
+            default :
+                _userPrompt("* Improper Input Detected. \nGoodbye!");
+                System.exit(0);
+                break;
+        }
+    }
+    
     // adds book to  class level list
     public static void _addBookToLibrary(){
 
@@ -85,37 +139,51 @@ public class BookHandler {
     }
     
     public static void _returnBook(){
-        int isbn = _checkISBN("What's the ISBN of the book you would like to return?");
-        boolean flag = false;
-        int bookIdx = 0;
-        
-        for (int i = 0; i < _booksAvailable.size();i++){
-            if (_booksAvailable.get(i).isbn == isbn){
-                flag = true;
-                bookIdx = i;
+        if (_booksChecked.size() != 0 && _booksAvailable.size() != 0){
+            int isbn = _checkISBN("What's the ISBN of the book you would like to return?");
+            boolean availableFlag = false;
+            boolean bookChckdFlag = false;
+            int bookAvailableIdx = -1;
+            int bookCheckedIdx = -1;
+            
+            for(int i = 0; i < _booksAvailable.size(); i++){
+                if (_booksAvailable.get(i).isbn == isbn){
+                    availableFlag = true;
+                    bookAvailableIdx = i;
+                }
             }
-        }
-        
-        if (flag == false){
-            Main.errorMessage("The ISBN was not found, returning to main menu");
-            return;
-        }
-        
-        Book oldBook = _booksAvailable.get(bookIdx);
-        oldBook.isBorrowed = false;
-        Book newBook = oldBook; // this is broken out to improve readability
-        
-        _booksAvailable.set(bookIdx, newBook);
-        
-        for (int i = 0; i < _booksChecked.size();i++){
-            if (_booksChecked.get(i).isbn == isbn){
-                bookIdx = i;
+
+            if (availableFlag == false || bookAvailableIdx < 0){
+                Main.errorMessage("The ISBN was not found within our library, returning to main menu");
+                return;
             }
+
+            Book oldBook = _booksAvailable.get(bookAvailableIdx);
+            oldBook.isBorrowed = false;
+            Book newBook = oldBook; // this is broken out to improve readability
+
+            for(int i = 0; i < _booksChecked.size(); i++){
+                if (_booksChecked.get(i).isbn == isbn){
+                    bookChckdFlag = true;
+                    bookCheckedIdx = i;
+                }
+            }
+            
+            if (bookChckdFlag == false || bookCheckedIdx < 0){
+                Main.errorMessage("The ISBN was not found to ahve been checked out, returning to main menu");
+                return;
+            }
+            // removes book from checked out arrayList
+            _booksChecked.remove(bookCheckedIdx);
+            
+            // updates book availability
+            _booksAvailable.set(bookAvailableIdx, newBook);
+            Main.userMessage("Your book, "+_booksAvailable.get(bookAvailableIdx).title+", has been returned sucessfully.");
+        } else {
+            Main.errorMessage("There are no books currently checked out.");
         }
-        
-        _booksChecked.remove(bookIdx);
     }
-    
+
     // prints all Books
     public static void _printAllBooks(){
         for(Book book : _booksAvailable){
@@ -175,6 +243,9 @@ public class BookHandler {
     // More importantly, this allows future devs to change how the user interaction occurs, and the change then occurs at a singular place & commit
     // Andrew here. I moved this one to the main class and renamed it.
     
+    private static void _userPrompt(String message){
+        System.out.println(message);
+    }
     
     // Formats double to $xyz.xy
     private static String _formatCost(double cost){

@@ -147,10 +147,7 @@ public class userMethods {
             if (users.userID.equals(desiredID)){
                 userFound = true;
                 
-                Main.userMessage("User Information: "
-                + "\nUser ID: " + users.userID
-                + "\nUser Name: " + users.lastName + ", " + users.firstName
-                + "\nUser Email: " + users.email);
+                Main.userMessage("User Information: " + "\nUser ID: " + users.userID + "\nUser Name: " + users.lastName + ", " + users.firstName + "\nUser Email: " + users.email);
                 
                 if (users.hasBorrowed == true){
                     //Display the borrowed books attached to users.userID once combined with Sean's code
