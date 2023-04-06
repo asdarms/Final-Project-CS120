@@ -28,6 +28,7 @@ public class BookHandler {
     }
 
     // home menu for funcs
+    // was only used for testing
     private static void _directory() {
         _userPrompt("[1] Would you like to add a book to the library's vault?");
         _userPrompt("[2] Would you like to remove a book from the library's vault?");
@@ -80,23 +81,19 @@ public class BookHandler {
     // adds book to  class level list
     public static void _addBookToLibrary() {
 
-        int isbn = _checkISBN("Whats the ISBN of the book you would like to add?");
+        int isbn = _checkISBN("What's the ISBN of the book you would like to add?\nIt can only be up to 3 digits.");
         if (isbn == -1) {
             return;
         }
-
         if (!_isDuplicateISBN(isbn)) {
-            return;
+            return; //returns if error fails
         }
-
-        double price = _checkPrice("Whats the price of the book you would like to add?");
+        double price = _checkPrice("What's the price of the book you would like to add?");
         if (price == -1.0) {
-            return;
+            return; //returns if check fails
         }
 
-        String title = Main.userString("Whats the title of the book you would like to add?");
-        //String title = _input.next();
-        //title += _input.nextLine();
+        String title = Main.userString("What's the title of the book you would like to add?");
 
         Book newBook = new Book(title, isbn, price, false);
 
@@ -105,20 +102,24 @@ public class BookHandler {
 
     // deletes Book obj from arraylist if isbn matches
     public static void _removeBookFromLibrary() {
-        int isbn = _checkISBN("Whats the ISBN of the book you would like to remove?");
+        int isbn = _checkISBN("What's the ISBN of the book you would like to remove?");
         if (isbn == -1) {
-            return;
+            return; //returns if check fails
         }
 
-        // NOTE: add logic to prevent deletion before book is returned
         for (int i = 0; i < _booksAvailable.size(); i++) {
             if (_booksAvailable.get(i).isbn == isbn) {
+                if (_booksAvailable.get(i).isBorrowed) {
+                    Main.errorMessage("Book must be returned first! Please try again.");
+                    return;
+                }
                 _booksAvailable.remove(i);
             }
         }
+        Main.userMessage("Book successfully deleted.");
     }
 
-    public static void _checkOutBook() {
+    public static void _checkOutBook() { //checks out a book to a user
         int isbn = _checkISBN("What's the ISBN of the book you would like to check out?");
         if (isbn == -1) {
             return;
@@ -127,7 +128,7 @@ public class BookHandler {
         boolean flag = false;
         int bookIdx = 0;
 
-        for (int i = 0; i < _booksAvailable.size(); i++) {
+        for (int i = 0; i < _booksAvailable.size(); i++) { //check if book exists
             if (_booksAvailable.get(i).isbn == isbn) {
                 flag = true;
                 bookIdx = i;
@@ -135,15 +136,18 @@ public class BookHandler {
         }
 
         if (flag == false) {
-            Main.errorMessage("The ISBN was not found, returning to main menu");
+            Main.errorMessage("That book could not be found! Please try again.");
             return;
         }
 
-        String userId = Main.userString("What's the User ID?");
-        // NOTE: Update this after merge
-        //check if exists
+        if (_booksAvailable.get(bookIdx).isBorrowed) {
+            Main.errorMessage("That book is already checked out! Please try again.");
+            return;
+        }
+
+        String userId = userMethods.findUser(); //finds the user
         if (!userMethods.doesUserExist(userId)) {
-            Main.errorMessage("That user does not exist!");
+            Main.errorMessage("That user could not be found! Please try again.");
             return;
         }
 
@@ -157,8 +161,8 @@ public class BookHandler {
         _booksChecked.add(newCheckOut);
     }
 
-    public static void _returnBook() {
-        if (_booksChecked.size() != 0 && _booksAvailable.size() != 0) {
+    public static void _returnBook() { //checks out a book and adds it to the borrowedBooks array
+        if (!_booksChecked.isEmpty() && !_booksAvailable.isEmpty()) {
             int isbn = _checkISBN("What's the ISBN of the book you would like to return?");
             if (isbn == -1) {
                 return;
@@ -177,7 +181,7 @@ public class BookHandler {
             }
 
             if (availableFlag == false || bookAvailableIdx < 0) {
-                Main.errorMessage("The ISBN was not found within our library, returning to main menu.");
+                Main.errorMessage("That book could not be found! Please try again.");
                 return;
             }
 
@@ -193,7 +197,7 @@ public class BookHandler {
             }
 
             if (bookChckdFlag == false || bookCheckedIdx < 0) {
-                Main.errorMessage("The ISBN was not found to have been checked out, returning to main menu.");
+                Main.errorMessage("That book is not currently checked out! Please try again.");
                 return;
             }
             // removes book from checked out arrayList
@@ -203,14 +207,17 @@ public class BookHandler {
             _booksAvailable.set(bookAvailableIdx, newBook);
             Main.userMessage("Your book, " + _booksAvailable.get(bookAvailableIdx).title + ", has been returned sucessfully.");
         } else {
-            Main.errorMessage("There are no books currently checked out.");
+            Main.userMessage("There are no books currently checked out.");
         }
     }
 
     // prints all Books
     public static void _printAllBooks() {
         for (Book book : _booksAvailable) {
-            Main.userMessage("Title: " + book.title + "\r\nISBN: " + String.valueOf(book.isbn) + "\r\nPrice: " + String.valueOf(_formatCost(book.price)) + "\r\n");
+            Main.userMessage("Title: " + book.title + "\nISBN: " + String.valueOf(book.isbn) + "\nPrice: " + String.valueOf(_formatCost(book.price)));
+        }
+        if (_booksAvailable.isEmpty()) {
+            Main.userMessage("There are currently no books in the library.");
         }
     }
 
@@ -219,58 +226,52 @@ public class BookHandler {
         for (BorrowedBook entity : _booksChecked) {
             Main.userMessage("ISBN: " + String.valueOf(entity.isbn) + "\r\nStudent ID: " + String.valueOf(entity.userId) + "\r\n");
         }
+        if (_booksChecked.isEmpty()) {
+            Main.userMessage("There are no books currently checked out.");
+        }
     }
 
     // searches by isbn and prints out a book object
     public static void _doesBookExist() {
-        int isbn = _checkISBN("Whats the ISBN of the book you are searching for?");
+        int isbn = _checkISBN("What's the ISBN of the book you are searching for?");
         if (isbn == -1) {
             return;
         }
 
         for (Book book : _booksAvailable) {
             if (book.isbn == isbn) {
-                Main.userMessage("The book was found!\r\n"
-                        + "Title: " + book.title + "\r\nISBN: "
-                        + String.valueOf(book.isbn) + "\r\nPrice: "
-                        + String.valueOf(_formatCost(book.price))
-                        + "\r\n");
-            } else {
-                Main.errorMessage("The book was not found!");
+                Main.userMessage("The book was found!\n" + "Title: " + book.title + "\nISBN: " + String.valueOf(book.isbn) + "\nPrice: " + String.valueOf(_formatCost(book.price)));
+                return;
             }
         }
+        Main.errorMessage("That book could not be found! Please try again.");
     }
 
     // updates book obj if isbn is found to match
     public static void _updateBookInLibrary() {
-        int isbn = _checkISBN("Whats the ISBN of the book you are wanting to update?");
+        int isbn = _checkISBN("What's the ISBN of the book you are wanting to update?");
         if (isbn == -1) {
             return;
         }
 
         for (int i = 0; i < _booksAvailable.size(); i++) {
             if (_booksAvailable.get(i).isbn == isbn) {
-                Main.userMessage("The book was found!\r\nIt currently has the following values.\r\n"
-                        + "Title: " + _booksAvailable.get(i).title + "\r\nISBN: "
-                        + String.valueOf(_booksAvailable.get(i).isbn) + "\r\nPrice: "
-                        + String.valueOf(_formatCost(_booksAvailable.get(i).price))
-                        + "\r\n");
-                double price = _checkPrice("Whats the new price of the book?");
+                Main.userMessage("The book was found!\nIt currently has the following values.\n" + "Title: " + _booksAvailable.get(i).title + "\nISBN: " + String.valueOf(_booksAvailable.get(i).isbn) + "\nPrice: " + String.valueOf(_formatCost(_booksAvailable.get(i).price)));
+                double price = _checkPrice("What's the new price of the book?");
                 if (price == -1.0) {
                     return;
                 }
 
-                String title = Main.userString("Whats the new title of the book?");
-                //String title = _input.next();
-                //title += _input.nextLine();
-
+                String title = Main.userString("What's the new title of the book?");
                 Book newBook = new Book(title, _booksAvailable.get(i).isbn, price, _booksAvailable.get(i).isBorrowed);
                 _booksAvailable.set(i, newBook);
+                return;
             }
         }
+        Main.errorMessage("That book could not be found! Please try again.");
     }
 
-    public static String _checkedOutBooksByUser(String userId) {
+    public static String _checkedOutBooksByUser(String userId) { //returns the titles of all books checked out by a given user
         String output = "";
         for (int i = 0; i < _booksChecked.size(); i++) {
             if (_booksChecked.get(i).userId.equals(userId)) {
@@ -287,8 +288,7 @@ public class BookHandler {
     // Helper Funcs
     // Used because I hate typing the same sys cmd print repeatedly in code
     // More importantly, this allows future devs to change how the user interaction occurs, and the change then occurs at a singular place & commit
-    // Andrew here. I moved this one to the main class and renamed it.
-    private static void _userPrompt(String message) {
+    private static void _userPrompt(String message) { //made redundant by userMessage method in main
         System.out.println(message);
     }
 
@@ -307,12 +307,8 @@ public class BookHandler {
             if (userInput <= 0) {
                 throw new InputMismatchException();
             }
-        } catch (java.util.InputMismatchException e) {
-            Main.errorMessage("You entered your value as an unrecognized value.\nMake sure it is in a correct format and try again.\nExamples: 97 or 36.8, not -29 or 0.");
-            return -1.0;
         } catch (Exception e) {
-            // I chose to not fail quietly here for all other exceptions to give the user some sort of failure notification
-            Main.errorMessage("An unknown error has occured.\nTry again and if the error persists, contact a System Admin.");
+            Main.errorMessage("Invalid input! Please try again.");
             return -1.0;
         }
         return userInput;
@@ -326,11 +322,7 @@ public class BookHandler {
                 }
             }
         } catch (java.util.InputMismatchException e) {
-            Main.errorMessage("The ISBN you entered was a duplicate value.");
-            return false;
-        } catch (Exception e) {
-            // I chose to not fail quietly here for all other exceptions to give the user some sort of failure notification
-            Main.errorMessage("An unknown error has occured.\nTry again and if the error persists, contact a System Admin.");
+            Main.errorMessage("The ISBN you entered was a duplicate value! Please try again.");
             return false;
         }
         return true;
@@ -344,12 +336,9 @@ public class BookHandler {
             if (String.valueOf(userInput).length() > 3 || userInput <= 0) {
                 throw new InputMismatchException();
             }
-        } catch (java.util.InputMismatchException e) {
-            Main.errorMessage("You entered too many characters and your value is now an unrecognized value.\nMake sure it is in a correct format and try again.\nExamples: 123 or 1, not -29 or 1234");
-            return -1;
         } catch (Exception e) {
             // I chose to not fail quietly here for all other exceptions to give the user some sort of failure notification
-            Main.errorMessage("An unknown error has occured.\nTry again and if the error persists, contact a System Admin.");
+            Main.errorMessage("Invalid input! Please try again.");
             return -1;
         }
         return userInput;

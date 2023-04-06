@@ -21,7 +21,7 @@ public class userMethods {
         testMenu();
     }
 
-    private static void testMenu() {
+    private static void testMenu() { //used for testing only
         int userInput;
         do {
             System.out.println("Please pick an available option: ");
@@ -62,7 +62,21 @@ public class userMethods {
         } while (userInput != 6);
     }
 
-    public static void createNewUser() {
+    public static String randomID() { //generates a random user id
+        String userID = "";
+
+        for (int i = 0; i < 8; i++) {
+            Random digit = new Random();
+            int randomInt = digit.nextInt(10);
+
+            String num = Integer.toString(randomInt);
+            userID = userID + num;
+        }
+
+        return userID;
+    }
+
+    public static void createNewUser() { //creates a new user and adds them to the main array
 
         boolean loop = true;
         JTextField firstName = new JTextField();
@@ -75,21 +89,9 @@ public class userMethods {
 
         //Enter and verify user information
         while (loop == true) {
-            Object[] addUserText
-                    = {
-                        "ID: ", userID,
-                        "First Name:", firstName,
-                        "Last Name:", lastName,
-                        "Email:", email
-                    };
+            Object[] addUserText  = {"ID: " + userID, "First Name:", firstName, "Last Name:", lastName, "Email:", email};
             JOptionPane.showConfirmDialog(null, addUserText, "Please fill in the following fields:", JOptionPane.PLAIN_MESSAGE);
-            Object[] confirmUserText
-                    = {
-                        "ID: " + userID,
-                        "FIRST NAME: " + firstName.getText(),
-                        "LAST NAME: " + lastName.getText(),
-                        "EMAIL: " + email.getText()
-                    };
+            Object[] confirmUserText = {"ID: " + userID, "FIRST NAME: " + firstName.getText(), "LAST NAME: " + lastName.getText(), "EMAIL: " + email.getText()};
             int confirmUserOption = JOptionPane.showConfirmDialog(null, confirmUserText, "Are the following fields correct?", JOptionPane.YES_NO_OPTION);
 
             //Verify User Information
@@ -100,28 +102,20 @@ public class userMethods {
 
         user newUser = new user(userID, firstName.getText(), lastName.getText(), email.getText(), false);
         currentUsers.add(newUser);
-
-        //Test. Can be commented out when complete
-        //showUserInfo();
     }
 
-    public static void editUserData() {
+    public static void editUserData() {  //allows editing an existing user in the active array
         JTextField firstName = new JTextField();
         JTextField lastName = new JTextField();
         JTextField email = new JTextField();
         boolean userFound = false;
-        String desiredID = Main.userString("Enter the ID of the desired user: ");
+        String desiredID = findUser();
 
         for (user users : currentUsers) {
             if (users.userID.equals(desiredID)) {
                 userFound = true;
 
-                Object[] editUserText
-                        = {
-                            "New First Name:", firstName,
-                            "New Last Name:", lastName,
-                            "New Email:", email
-                        };
+                Object[] editUserText = {"New First Name:", firstName, "New Last Name:", lastName, "New Email:", email};
                 JOptionPane.showConfirmDialog(null, editUserText, "Please fill in the following fields:", JOptionPane.PLAIN_MESSAGE);
 
                 //Update User Information
@@ -131,16 +125,14 @@ public class userMethods {
             }
         }
         if (userFound == false) {
-            Main.errorMessage("User doesn't exist!");
+            Main.errorMessage("User could not be found! Please try again.");
         }
-        //Test. Can be commented out when complete
-        //showUserInfo();
     }
 
-    public static void showUserData() {
+    public static void showUserData() { //searches for a specific user and displays their data
         boolean userFound = false;
 
-        String desiredID = Main.userString("Enter the ID of the desired user: ");
+        String desiredID = findUser();
 
         for (user users : currentUsers) {
             if (users.userID.equals(desiredID)) {
@@ -150,14 +142,14 @@ public class userMethods {
             }
         }
         if (userFound != true) {
-            Main.errorMessage("User doesn't exist");
+            Main.errorMessage("User could not be found! Please try again.");
         }
     }
 
-    public static void archiveCurrentUser() {
+    public static void archiveCurrentUser() { //moves a user from the active array to the archived array
         boolean userFound = false;
         user userIndex = null;
-        String desiredID = Main.userString("Enter the ID of the desired user: ");
+        String desiredID = findUser();
 
         for (user users : currentUsers) {
             if (users.userID.equals(desiredID)) {
@@ -165,29 +157,25 @@ public class userMethods {
                 userIndex = users;
             }
         }
-
+        if (userFound == false) {
+            Main.errorMessage("User could not be found! Please try again.");
+            return;
+        }
         if (userIndex.hasBorrowed == true) {
-            Main.errorMessage("User can not be archived while having borrowed a book");
+            Main.errorMessage("User can not be archived whilst having borrowed a book! Please try again.");
         } else {
             archivedUser removedUser = new archivedUser(userIndex.userID, userIndex.firstName, userIndex.lastName, userIndex.email);
             archivedUsers.add(removedUser);
 
             currentUsers.remove(userIndex);
+            Main.userMessage("The user has been successfully archived.");
         }
-        if (userFound == false) {
-            Main.errorMessage("User doesn't exist");
-            testMenu();
-        }
-        /*System.out.println("Current Users: ");
-        showUserInfo();
-        System.out.println("Archived Users: ");
-        showArchivedInfo(); */
     }
 
-    public static void reactivateUser() {
+    public static void reactivateUser() { //moves an archived user back into the active users array
         boolean userFound = false;
         archivedUser userIndex = null;
-        String desiredID = Main.userString("Enter the ID of the desired user: ");
+        String desiredID = findArchivedUser();
 
         for (archivedUser users : archivedUsers) {
             if (users.userID.equals(desiredID)) {
@@ -196,35 +184,35 @@ public class userMethods {
             }
         }
         if (userFound == false) {
-            Main.errorMessage("User doesn't exist");
+            Main.errorMessage("User could not be found! Please try again.");
             return;
         }
         user reactivatedUser = new user(userIndex.userID, userIndex.firstName, userIndex.lastName, userIndex.email, false);
         currentUsers.add(reactivatedUser);
 
         archivedUsers.remove(userIndex);
-
-        /*System.out.println("Current Users: ");
-        showUserInfo();
-        System.out.println("Archived Users: ");
-        showArchivedInfo();*/
+        Main.userMessage("The user has been successfully reactivated.");
     }
 
-    public static void showUserInfo() {
-        //Displays current activates user IDs for testing purposes
+    public static void showUserInfo() {//Displays current active users
         for (user users : currentUsers) {
             Main.userMessage("User ID: " + users.userID + "\nUser Name: " + users.lastName + ", " + users.firstName + "\nUser Email: " + users.email + "\nBooks Borrowed (ISBNs): " + BookHandler._checkedOutBooksByUser(users.userID));
         }
-    }
-
-    public static void showArchivedInfo() {
-        //Displays current activates user IDs for testing purposes
-        for (archivedUser users : archivedUsers) {
-            Main.userMessage("User ID: " + users.userID + "\nUser Name: " + users.lastName + ", " + users.firstName + "\nUser Email: " + users.email);
+        if (currentUsers.isEmpty()) {
+            Main.userMessage("There are currently no active users.");
         }
     }
 
-    public static boolean doesUserExist(String desiredID) {
+    public static void showArchivedInfo() { //Displays current archived users
+        for (archivedUser users : archivedUsers) {
+            Main.userMessage("User ID: " + users.userID + "\nUser Name: " + users.lastName + ", " + users.firstName + "\nUser Email: " + users.email);
+        }
+        if (archivedUsers.isEmpty()) {
+            Main.userMessage("There are currently no archived users.");
+        }
+    }
+
+    public static boolean doesUserExist(String desiredID) { //checks if a user exists and returns a boolean
         for (user users : currentUsers) {
             if (users.userID.equals(desiredID)) {
                 return true;
@@ -233,26 +221,38 @@ public class userMethods {
         return false;
     }
 
-    private static void isDuplicateID(String userID) {
+    public static String findUser() { //allows searching for a user by last name to avoid having to memorize IDs
+        String lastName = Main.userString("What is the last name of the user you are looking for?");
+        for (user users : currentUsers) {
+            if (users.lastName.equalsIgnoreCase(lastName)) {
+                int confirmUserOption = JOptionPane.showConfirmDialog(null, "User ID: " + users.userID + "\nUser Name: " + users.lastName + ", " + users.firstName + "\nUser Email: " + users.email + "\nBooks Borrowed (ISBNs): " + BookHandler._checkedOutBooksByUser(users.userID), "Is this the correct user?", JOptionPane.YES_NO_OPTION);
+                if (confirmUserOption == JOptionPane.YES_OPTION) {
+                    return users.userID;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public static String findArchivedUser() { //findUser but for archived users
+        String lastName = Main.userString("What is the last name of the user you are looking for?");
+        for (archivedUser users : archivedUsers) {
+            if (users.lastName.equalsIgnoreCase(lastName)) {
+                int confirmUserOption = JOptionPane.showConfirmDialog(null, "User ID: " + users.userID + "\nUser Name: " + users.lastName + ", " + users.firstName + "\nUser Email: " + users.email, "Is this the correct user?", JOptionPane.YES_NO_OPTION);
+                if (confirmUserOption == JOptionPane.YES_OPTION) {
+                    return users.userID;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void isDuplicateID(String userID) { //checks if a generated ID is a duplicate and regenerates
         for (user users : currentUsers) {
             if (users.userID.equals(userID)) {
                 userID = randomID();
             }
         }
-    }
-
-    public static String randomID() {
-        String userID = "";
-
-        for (int i = 0; i < 1; i++) {
-            Random digit = new Random();
-            int randomInt = digit.nextInt(10);
-
-            String num = Integer.toString(randomInt);
-            userID = userID + num;
-        }
-
-        return userID;
     }
 
 }
