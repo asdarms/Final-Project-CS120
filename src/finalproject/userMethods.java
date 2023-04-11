@@ -14,7 +14,7 @@ import javax.swing.*;
 public class userMethods {
 
     public static Scanner input = new Scanner(System.in);
-    private static ArrayList<user> currentUsers = new ArrayList<user>();
+    public static ArrayList<user> currentUsers = new ArrayList<user>();
     private static ArrayList<archivedUser> archivedUsers = new ArrayList<archivedUser>();
 
     public static void main() {
@@ -194,7 +194,7 @@ public class userMethods {
         Main.userMessage("The user has been successfully reactivated.");
     }
 
-    public static void showUserInfo() {//Displays current active users
+    public static void showAllUsers() { //Displays current active users
         for (user users : currentUsers) {
             Main.userMessage("User ID: " + users.userID + "\nUser Name: " + users.lastName + ", " + users.firstName + "\nUser Email: " + users.email + "\nBooks Borrowed (ISBNs): " + BookHandler._checkedOutBooksByUser(users.userID));
         }

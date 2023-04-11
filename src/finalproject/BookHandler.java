@@ -151,6 +151,11 @@ public class BookHandler {
             return;
         }
 
+        for (user users : userMethods.currentUsers) {
+            if (users.userID.equals(userId)) {
+                users.hasBorrowed = true;
+            }
+        }
         Book oldBook = _booksAvailable.get(bookIdx);
         oldBook.isBorrowed = true;
         Book newBook = oldBook; // this is broken out to improve readability
@@ -299,7 +304,7 @@ public class BookHandler {
     }
 
     // Checks if dble is negative
-    private static Double _checkPrice(String message) {
+    private static double _checkPrice(String message) {
         //set to -1.0 here as default to be caught if value isnt set
         double userInput = -1.0;
         try {
@@ -314,6 +319,7 @@ public class BookHandler {
         return userInput;
     }
 
+    //check if isbn already exists and returns true/false
     private static boolean _isDuplicateISBN(int ISBN) {
         try {
             for (Book book : _booksAvailable) {
@@ -323,6 +329,9 @@ public class BookHandler {
             }
         } catch (java.util.InputMismatchException e) {
             Main.errorMessage("The ISBN you entered was a duplicate value! Please try again.");
+            return false;
+        } catch (Exception e) {
+            Main.errorMessage("An unknown error occurred. Please contact the system administrator.");
             return false;
         }
         return true;

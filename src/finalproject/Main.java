@@ -76,7 +76,7 @@ public class Main {
                                     userMethods.editUserData();
                                     break;
                                 case "3":
-                                    userMethods.showUserInfo();
+                                    userMethods.showAllUsers();
                                     break;
                                 case "4":
                                     userMethods.showUserData();
