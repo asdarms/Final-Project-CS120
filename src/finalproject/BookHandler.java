@@ -205,6 +205,11 @@ public class BookHandler {
                 Main.errorMessage("That book is not currently checked out! Please try again.");
                 return;
             }
+            for (user users : userMethods.currentUsers) {
+                if (users.userID.equals(_booksChecked.get(bookCheckedIdx).userId)) {
+                    users.hasBorrowed = true;
+                }
+            }
             // removes book from checked out arrayList
             _booksChecked.remove(bookCheckedIdx);
 
